@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* carousel button position of Home page*/
+.carousel-btn {
+    @apply absolute flex justify-end transform -translate-y-1/2 left-5 right-5 bottom-0 space-x-5
+}
+
+.default-btn {
+    @apply text-orange border border-orange py-2 px-3 rounded-md font-bold cursor-pointer
+}
+
+.default-btn:hover {
+    color: #737373;
+}
