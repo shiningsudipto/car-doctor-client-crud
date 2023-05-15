@@ -1,26 +1,46 @@
 import React, { useContext } from 'react';
 import img from '../assets/images/login/login.svg';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Provider/AuthProvider';
+import SocialSignIn from './Shared/SocialSignIn';
 
 const Login = () => {
     const { signIn } = useContext(AuthContext);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const from = location.state?.from?.pathname || '/';
     const handleLogin = event => {
         event.preventDefault();
         const form = event.target;
-        const name = form.name.value;
         const email = form.email.value;
         const password = form.password.value;
-        console.log((name, email, password));
+        console.log(email, password);
 
         signIn(email, password)
             .then(result => {
                 const user = result.user;
+                const loggedUser = {
+                    email: user.email
+                }
                 console.log(user);
+                fetch('https://car-doctor-server-crud.vercel.app/jwt', {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(loggedUser)
+                })
+                    // navigate(from, { replace: true })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data);
+                        localStorage.setItem('access-token', data.token)
+                    })
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                console.log(errorMessage, errorCode);
             });
     }
     return (
@@ -55,6 +75,7 @@ const Login = () => {
                             </form>
                             <p>New to the Car Doctor? <Link className='text-orange' to="/registration">Registration</Link></p>
                         </div>
+                        <SocialSignIn />
                     </div>
                 </div>
             </div>

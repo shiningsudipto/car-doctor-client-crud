@@ -1,24 +1,71 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../Provider/AuthProvider';
 import BookingRow from './BookingRow';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const Bookings = () => {
-    const { user } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
     const [bookings, setBookings] = useState([])
-    const url = `http://localhost:3000/bookings?email=${user.email}`
+    const url = `https://car-doctor-server-crud.vercel.app/bookings?email=${user.email}`
+    const navigate = useNavigate;
+    // useEffect(() => {
+    //     fetch(url, {
+    //         method: 'GET',
+    //         headers: {
+    //             authorization: `Bearer ${localStorage.getItem('access-token')}`
+    //         }
+    //     })
+    //         .then(res => {
+    //             const response = res.json();
+    //             if (!res.ok) {
+    //                 logout()
+    //                     .then(() => {
+    //                         localStorage.removeItem('access-token')
+    //                     })
+    //                     .catch(() => { })
+    //                 throw new Error(response);
+    //             }
+    //             return response
+    //         }
+    //         )
+    //         .then(data => {
+    //             console.log(data);
+    //             if (!data.error) {
+    //                 setBookings(data)
+    //             }
+    //             else {
+    //                 navigate('/')
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.log(error);
+    //         })
+    // }, [url]);
     useEffect(() => {
-        fetch(url)
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                authorization: `Bearer ${localStorage.getItem('access-token')}`
+            }
+        })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
-                setBookings(data)
+                if (!data.error) {
+                    setBookings(data)
+                }
+                else {
+                    navigate('/')
+                }
             })
-    }, [url]);
+            .catch(error => {
+                console.log(error);
+            })
+    }, [url, navigate]);
 
     const handleDelete = id => {
         const proceed = confirm('Are you sure you want to delete?')
         if (proceed) {
-            fetch(`http://localhost:3000/bookings/${id}`, {
+            fetch(`https://car-doctor-server-crud.vercel.app/bookings/${id}`, {
                 method: 'DELETE'
             }
             )
@@ -35,7 +82,7 @@ const Bookings = () => {
     }
 
     const handleConfirm = id => {
-        fetch(`http://localhost:3000/bookings/${id}`, {
+        fetch(`https://car-doctor-server-crud.vercel.app/bookings/${id}`, {
             method: 'PATCH',
             headers: {
                 'content-type': 'application/json'
@@ -70,7 +117,7 @@ const Bookings = () => {
                                         <input type="checkbox" className="checkbox" />
                                     </label>
                                 </th>
-                                <th>Name</th>
+                                <th className='lg:ps-36'>Name</th>
                                 <th>Service</th>
                                 <th>Price</th>
                                 <th>Date</th>
